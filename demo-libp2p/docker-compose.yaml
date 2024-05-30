@@ -1,0 +1,76 @@
+version: "3"
+
+services:
+  js-p2p-relay:
+    container_name: js-p2p-relay1
+    image: bs/jslibp2p:0.0.1
+    build:
+      context: ./js-libp2p
+    ports:
+      - 13000:3000
+    networks:
+      - mynet1
+      - mynet2
+    pull_policy: build
+
+  js-p2p-node1:
+    container_name: js-p2p-node1
+    image: bs/jslibp2p:0.0.1
+    ports:
+      - 23000:3000
+    networks:
+      - mynet1
+    depends_on:
+      - js-p2p-relay
+
+  js-p2p-node2:
+    container_name: js-p2p-node2
+    image: bs/jslibp2p:0.0.1
+    ports:
+      - 33000:3000
+    networks:
+      - mynet2
+    depends_on:
+      - js-p2p-relay
+
+  go-p2p-relay:
+    container_name: go-p2p-relay1
+    image: bs/golibp2p:0.0.1
+    build:
+      context: ./go-libp2p
+      target: app
+    ports:
+      - 28080:8080
+    networks:
+      - mynet1
+      - mynet2
+    pull_policy: build
+
+  go-p2p-node1:
+    container_name: go-p2p-node1
+    image: bs/golibp2p:0.0.1
+    ports:
+      - 38080:8080
+    networks:
+      - mynet1
+    depends_on:
+      - go-p2p-relay
+
+  go-p2p-node2:
+    container_name: go-p2p-node2
+    image: bs/golibp2p:0.0.1
+    ports:
+      - 48080:8080
+    networks:
+      - mynet2
+    depends_on:
+      - go-p2p-relay
+
+
+networks:
+  mynet1:
+    name: mynet1
+    driver: bridge
+  mynet2:
+    name: mynet2
+    driver: bridge
